@@ -11,8 +11,8 @@
     ],
     "rewrites": [
       {
-        "source": "/proc",
-        "function": "proc"
+        "source": "/helloWorld",
+        "function": "helloWorld"
       },
       {
         "source": "**",

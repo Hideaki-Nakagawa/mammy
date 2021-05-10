@@ -1,9 +1,8 @@
-import React, { useState } from "react";
+import React, { useCallback, useState } from "react";
 import {
   Theme,
   createStyles,
   makeStyles,
-  FormControl,
   FormHelperText,
   Input,
   InputAdornment,
@@ -42,6 +41,7 @@ type Props = {
   fontType: IconPrefix;
   fontIconName: IconName;
   addClass: ClassNameMap;
+  onChange: any;
 };
 
 /**
@@ -55,11 +55,18 @@ const InputField = (props: Props) => {
   /**
    * @summary state change
    * @details ステートを変更して、親要素に値を投げる
+   * @attention useCallbackを利用することで再描画のたびに関数インスタンスを生成しなくて済む
    */
-  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const newValue = event.target.value;
-    setText(newValue);
-  };
+  const handleChange = useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      const newValue = event.target.value;
+      setText(newValue);
+      if (props.onChange) {
+        props.onChange(newValue);
+      }
+    },
+    []
+  );
 
   /** @summary style hook api */
   const classes = useStyles();
@@ -68,7 +75,7 @@ const InputField = (props: Props) => {
   const matches = useMediaQuery("(min-width:768px)");
 
   return (
-    <FormControl
+    <div
       className={`${classes.margin} ${classes.withoutLabel} ${
         matches ? props.addClass.sizeBig : props.addClass.sizeSmall
       }`}
@@ -94,7 +101,7 @@ const InputField = (props: Props) => {
           "aria-label": props.areaLabel,
         }}
       />
-    </FormControl>
+    </div>
   );
 };
 

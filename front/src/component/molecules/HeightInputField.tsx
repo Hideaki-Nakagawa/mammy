@@ -1,12 +1,13 @@
-import React from "react";
+import React, { useContext } from "react";
 import { InputField } from "../atoms";
 import { Theme, makeStyles, createStyles } from "@material-ui/core";
 import { ClassNameMap } from "@material-ui/styles";
+import { DiagnoseContext } from "../page/Diagnose";
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     sizeBig: {
-      width: "15em",
+      width: "20em",
     },
     sizeSmall: {
       width: "5em",
@@ -15,9 +16,11 @@ const useStyles = makeStyles((theme: Theme) =>
 );
 
 /** 身長入力フィールド コンポーネント */
-const HeightInputField = () => {
+const HeightInputField: React.FC = () => {
   /** @summary style hook api */
   const classes: ClassNameMap = useStyles();
+  /** @summary context hook api */
+  const diagnose = useContext(DiagnoseContext);
 
   return (
     <InputField
@@ -31,6 +34,7 @@ const HeightInputField = () => {
       areaLabel="height"
       fontType="fas"
       fontIconName="ruler"
+      onChange={(newValue: string) => (diagnose.height = newValue)}
     />
   );
 };

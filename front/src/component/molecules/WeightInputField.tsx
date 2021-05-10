@@ -1,7 +1,8 @@
-import React from "react";
+import React, { useContext } from "react";
 import { InputField } from "../atoms";
 import { Theme, makeStyles, createStyles } from "@material-ui/core";
 import { ClassNameMap } from "@material-ui/styles";
+import { DiagnoseContext } from "../page/Diagnose";
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -15,9 +16,11 @@ const useStyles = makeStyles((theme: Theme) =>
 );
 
 /** 体重入力フィールド コンポーネント */
-const WeightInputField = () => {
+const WeightInputField: React.FC = () => {
   /** @summary style hook api */
   const classes: ClassNameMap = useStyles();
+  /** @summary context hook api */
+  const diagnose = useContext(DiagnoseContext);
 
   return (
     <InputField
@@ -31,6 +34,7 @@ const WeightInputField = () => {
       areaLabel="weight"
       fontType="fas"
       fontIconName="weight"
+      onChange={(newValue: string) => (diagnose.weight = newValue)}
     />
   );
 };

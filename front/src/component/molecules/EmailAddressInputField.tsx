@@ -1,12 +1,13 @@
-import React from "react";
+import React, { useContext } from "react";
 import { InputField } from "../atoms";
 import { Theme, makeStyles, createStyles } from "@material-ui/core";
 import { ClassNameMap } from "@material-ui/styles";
+import { LoginContext } from "../page/Login";
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     sizeBig: {
-      width: "15em",
+      width: "30em",
     },
     sizeSmall: {
       width: "15em",
@@ -15,9 +16,11 @@ const useStyles = makeStyles((theme: Theme) =>
 );
 
 /** メールアドレス入力フィールド コンポーネント */
-const EmailAddressInputField = () => {
+const EmailAddressInputField: React.FC = () => {
   /** @summary style hook api */
   const classes: ClassNameMap = useStyles();
+  /** @summary context hook api */
+  const login = useContext(LoginContext);
 
   return (
     <InputField
@@ -31,6 +34,7 @@ const EmailAddressInputField = () => {
       areaLabel="email"
       fontType="fas"
       fontIconName="envelope"
+      onChange={(newValue: string) => (login.emailAddress = newValue)}
     />
   );
 };

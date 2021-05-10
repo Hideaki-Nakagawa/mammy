@@ -1,24 +1,38 @@
-import React, { useEffect, useState } from "react";
-import { Theme, makeStyles, createStyles, Grid } from "@material-ui/core";
+import React, { createContext } from "react";
+import {
+  Theme,
+  makeStyles,
+  createStyles,
+  Grid,
+  Avatar,
+  Typography,
+} from "@material-ui/core";
 import { ClassNameMap } from "@material-ui/styles";
-import { LoginForm, SplashLogo } from "../organisms";
+import { LoginForm } from "../organisms";
+import LockOutlinedIcon from "@material-ui/icons/LockOutlined";
 
-const useStyles = makeStyles((theme: Theme) => createStyles({}));
+const useStyles = makeStyles((theme: Theme) =>
+  createStyles({
+    avatar: {
+      margin: theme.spacing(1),
+      backgroundColor: theme.palette.secondary.main,
+    },
+  })
+);
+
+/** Login Context */
+export const LoginContext = createContext({
+  emailAddress: "",
+  password: "",
+} as {
+  emailAddress: string;
+  password: string;
+});
 
 /** ログインページ コンポーネント */
-const Login = () => {
+const Login: React.FC = () => {
   /** @summary style hook api */
   const classes: ClassNameMap = useStyles();
-
-  /** @summary state hook */
-  const [splash, setShow] = useState(true);
-
-  /** @summary life cycle */
-  useEffect(() => {
-    setTimeout(() => {
-      setShow(false);
-    }, 3000);
-  }, []);
 
   return (
     <Grid
@@ -28,7 +42,13 @@ const Login = () => {
       alignItems="center"
       className="height:100%"
     >
-      {splash ? <SplashLogo /> : <LoginForm />}
+      <Avatar className={classes.avatar}>
+        <LockOutlinedIcon />
+      </Avatar>
+      <Typography component="h1" variant="h5">
+        Account
+      </Typography>
+      <LoginForm />
     </Grid>
   );
 };

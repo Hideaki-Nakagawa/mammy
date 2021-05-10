@@ -5,12 +5,13 @@ import {
   EmailAddressInputField,
   LoginButton,
   PasswordInputField,
+  SingUpButton,
 } from "../molecules";
 
 const useStyles = makeStyles((theme: Theme) => createStyles({}));
 
 /** ログインフォーム コンポーネント */
-const LoginForm = () => {
+const LoginForm: React.FC = () => {
   /** @summary style hook api */
   const classes: ClassNameMap = useStyles();
 
@@ -19,6 +20,7 @@ const LoginForm = () => {
       <EmailAddressInputField />
       <PasswordInputField />
       <LoginButton />
+      <SingUpButton />
     </Grid>
   );
 };

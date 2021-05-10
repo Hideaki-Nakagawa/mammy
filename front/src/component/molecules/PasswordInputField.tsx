@@ -1,12 +1,13 @@
-import React from "react";
+import React, { useContext } from "react";
 import { InputField } from "../atoms";
 import { Theme, makeStyles, createStyles } from "@material-ui/core";
 import { ClassNameMap } from "@material-ui/styles";
+import { LoginContext } from "../page/Login";
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     sizeBig: {
-      width: "15em",
+      width: "30em",
     },
     sizeSmall: {
       width: "15em",
@@ -15,18 +16,11 @@ const useStyles = makeStyles((theme: Theme) =>
 );
 
 /** パスワード入力フィールド コンポーネント */
-const PasswordInputField = () => {
-  //自力でパスワードの表示/非表示の処理を作ったけど、いらなかったのでコメント
-  /** @summary state hook */
-  //const [visible, showPassword] = useState(false);
-
-  /** @summary change state click icon */
-  // const handleClick = () => {
-  //     showPassword(!visible);
-  // };
-
+const PasswordInputField: React.FC = () => {
   /** @summary style hook api */
   const classes: ClassNameMap = useStyles();
+  /** @summary context hook api */
+  const login = useContext(LoginContext);
 
   return (
     <InputField
@@ -35,14 +29,13 @@ const PasswordInputField = () => {
       titleText="Password"
       id="password_input"
       unitText=""
-      //inputType={visible ? 'text' : 'password'}
       inputType="password"
       maxLength={50}
       areaLabel="password"
       fontType="fas"
       fontIconName="key"
+      onChange={(newValue: string) => (login.password = newValue)}
     />
-    // <FontAwesomeIcon icon={['fas', visible ? 'eye' : 'eye-slash']} onClick={handleClick} />
   );
 };
 export default PasswordInputField;

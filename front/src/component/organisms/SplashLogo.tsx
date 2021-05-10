@@ -6,7 +6,9 @@ import {
   useMediaQuery,
 } from "@material-ui/core";
 import { ClassNameMap } from "@material-ui/styles";
+import splash from "../../resource/images/logo.png";
 
+/** Splash logo Style */
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     sizeBig: {
@@ -20,8 +22,8 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 );
 
-/** ロゴ コンポーネント */
-const SplashLogo = () => {
+/** Splash logo コンポーネント */
+const SplashLogo: React.FC = () => {
   /** @summary style hook api */
   const classes: ClassNameMap = useStyles();
 
@@ -29,11 +31,12 @@ const SplashLogo = () => {
   const matches = useMediaQuery("(min-width:768px)");
 
   return (
-    <img
-      src="../../resource/img/logo.png"
-      className={`${matches ? classes.sizeBig : classes.sizeSmall}`}
-      alt=""
-    />
+    <div>
+      <img
+        src={splash}
+        className={`${matches ? classes.sizeBig : classes.sizeSmall}`}
+      />
+    </div>
   );
 };
 export default SplashLogo;

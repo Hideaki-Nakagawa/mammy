@@ -2,6 +2,8 @@ const path = require("path");
 const glob = require("glob");
 const TerserPlugin = require("terser-webpack-plugin");
 const htmlWebpackPlugin = require("html-webpack-plugin");
+const webpack = require("webpack");
+const dotenv = require("dotenv");
 const config = {
   performance: { hints: false },
   mode: "production",
@@ -62,6 +64,11 @@ const config = {
         template: file
       })
   ),
+  plugins: [
+    new webpack.DefinePlugin({
+      'process.env': JSON.stringify(dotenv.config().parsed)
+    }),
+  ],
   devServer: {
     open: true,
     inline: true,
