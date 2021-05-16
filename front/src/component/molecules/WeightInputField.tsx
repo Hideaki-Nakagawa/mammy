@@ -7,10 +7,13 @@ import { DiagnoseContext } from "../page/Diagnose";
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     sizeBig: {
-      width: "15em",
+      width: "15rem",
     },
     sizeSmall: {
-      width: "5em",
+      width: "7.5rem",
+    },
+    overrideInput: {
+      textAlign: "center",
     },
   })
 );
@@ -34,7 +37,11 @@ const WeightInputField: React.FC = () => {
       areaLabel="weight"
       fontType="fas"
       fontIconName="weight"
-      onChange={(newValue: string) => (diagnose.weight = newValue)}
+      onChange={(newValue: string) => {
+        diagnose.setWeight(newValue);
+        diagnose.weight = newValue;
+      }}
+      value={diagnose.weight}
     />
   );
 };

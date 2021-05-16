@@ -34,7 +34,11 @@ const PasswordInputField: React.FC = () => {
       areaLabel="password"
       fontType="fas"
       fontIconName="key"
-      onChange={(newValue: string) => (login.password = newValue)}
+      onChange={(newValue: string) => {
+        login.setPassword(newValue);
+        login.password = newValue;
+      }}
+      value={login.password}
     />
   );
 };

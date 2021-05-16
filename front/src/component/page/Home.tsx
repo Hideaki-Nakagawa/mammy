@@ -19,6 +19,9 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 );
 
+/** PageID */
+export const HomePageID = 2;
+
 /** ホームページ コンポーネント */
 const Home: React.FC = () => {
   /** @summary style hook api */

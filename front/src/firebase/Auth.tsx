@@ -5,13 +5,15 @@ import "firebase/auth";
 
 /** Auth Context */
 const AuthContext = createContext({
-  currentUser: null,
+  // currentUser: null,
 } as {
   currentUser: firebase.User | null;
-  signup: (email: string, password: string) => Promise<void>;
-  signin: (email: string, password: string) => Promise<void>;
+  signup: (email: string, password: string) => Promise<string>;
+  signin: (email: string, password: string) => Promise<string>;
   signinWithGoogle: () => Promise<void>;
   signout: () => Promise<void>;
+  updateProfile: (displayName: string, photoURL: string) => Promise<string>;
+  resetPassword: (email: string) => Promise<string>;
 });
 
 /** Authコンポーネント */
@@ -23,28 +25,41 @@ const AuthProvider: React.FC = ({ children }) => {
    * @summary メールアドレスでアカウントを作成
    * @param[in] email : メールアドレス
    * @param[in] password : パスワード
+   * @retval success : 成功
+   * @retval failure : 失敗
    */
-  const signup = useCallback(async (email: string, password: string) => {
-    try {
-      await app.auth().createUserWithEmailAndPassword(email, password);
-    } catch (error) {
-      alert(error);
-    }
-  }, []);
+  const signup = useCallback(
+    async (email: string, password: string): Promise<string> => {
+      try {
+        await app.auth().createUserWithEmailAndPassword(email, password);
+        return "success";
+      } catch (error) {
+        alert(error);
+        return "failure";
+      }
+    },
+    []
+  );
 
   /**
    * @summary メールアドレスでログイン
    * @param[in] email : メールアドレス
    * @param[in] password : パスワード
+   * @retval success : 成功
+   * @retval failure : 失敗
    */
-  const signin = useCallback(async (email: string, password: string) => {
-    try {
-      await app.auth().signInWithEmailAndPassword(email, password);
-      app.auth().onAuthStateChanged((user) => setCurrentUser(user));
-    } catch (error) {
-      alert(error);
-    }
-  }, []);
+  const signin = useCallback(
+    async (email: string, password: string): Promise<string> => {
+      try {
+        await app.auth().signInWithEmailAndPassword(email, password);
+        return "success";
+      } catch (error) {
+        alert(error);
+        return "failure";
+      }
+    },
+    []
+  );
 
   /**
    * @summary Googleアカウントでログイン
@@ -52,8 +67,7 @@ const AuthProvider: React.FC = ({ children }) => {
   const signinWithGoogle = useCallback(async () => {
     const provider = new firebase.auth.GoogleAuthProvider();
     try {
-      await firebase.auth().signInWithPopup(provider);
-      app.auth().onAuthStateChanged((user) => setCurrentUser(user));
+      await app.auth().signInWithPopup(provider);
     } catch (error) {
       alert(error);
     }
@@ -65,9 +79,44 @@ const AuthProvider: React.FC = ({ children }) => {
   const signout = useCallback(async () => {
     try {
       await app.auth().signOut();
-      setCurrentUser(null);
     } catch (error) {
       alert(error);
+    }
+  }, []);
+
+  /**
+   * @summary ユーザプロファイルを更新する
+   * @param[in] displayName : ユーザー名
+   * @param[in] photoURL : ユーザー画像
+   * @retval success : 成功
+   * @retval failure : 失敗
+   */
+  const updateProfile = useCallback(
+    async (displayName: string, photoURL: string): Promise<string> => {
+      try {
+        await app.auth().currentUser?.updateProfile({ displayName, photoURL });
+        return "success";
+      } catch (error) {
+        alert(error);
+        return "failure";
+      }
+    },
+    []
+  );
+
+  /**
+   * @summary パスワードを再設定するためのメールを送る
+   * @param[in] email : メールアドレス
+   * @retval success : 成功
+   * @retval failure : 失敗
+   */
+  const resetPassword = useCallback(async (email: string): Promise<string> => {
+    try {
+      await app.auth().sendPasswordResetEmail(email);
+      return "success";
+    } catch (error) {
+      alert(error);
+      return "failure";
     }
   }, []);
 
@@ -77,12 +126,22 @@ const AuthProvider: React.FC = ({ children }) => {
    * @attention 1回だけ
    */
   useEffect(() => {
-    app.auth().onAuthStateChanged((user) => setCurrentUser(user));
+    app.auth().onAuthStateChanged(function (user) {
+      setCurrentUser(user);
+    });
   }, []);
 
   return (
     <AuthContext.Provider
-      value={{ currentUser, signup, signin, signinWithGoogle, signout }}
+      value={{
+        currentUser,
+        signup,
+        signin,
+        signinWithGoogle,
+        signout,
+        updateProfile,
+        resetPassword,
+      }}
     >
       {children}
     </AuthContext.Provider>

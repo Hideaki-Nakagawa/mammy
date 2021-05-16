@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from "react";
+import React, { useCallback } from "react";
 import {
   Theme,
   createStyles,
@@ -24,6 +24,9 @@ const useStyles = makeStyles((theme: Theme) =>
     iconMargin: {
       marginRight: theme.spacing(1),
     },
+    width: {
+      width: "100%",
+    },
   })
 );
 
@@ -42,6 +45,7 @@ type Props = {
   fontIconName: IconName;
   addClass: ClassNameMap;
   onChange: any;
+  value: string;
 };
 
 /**
@@ -49,30 +53,26 @@ type Props = {
  * @param props : Prpps
  */
 const InputField = (props: Props) => {
-  /** @summary state hook */
-  const [myText, setText] = useState("");
+  /** @summary style hook api */
+  const classes = useStyles();
+
+  /** @summary media query */
+  const matches = useMediaQuery("(min-width:768px)");
 
   /**
    * @summary state change
-   * @details ステートを変更して、親要素に値を投げる
+   * @details 入力値が変更されたので親のonChange関数を呼ぶ
    * @attention useCallbackを利用することで再描画のたびに関数インスタンスを生成しなくて済む
    */
   const handleChange = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
       const newValue = event.target.value;
-      setText(newValue);
       if (props.onChange) {
         props.onChange(newValue);
       }
     },
     []
   );
-
-  /** @summary style hook api */
-  const classes = useStyles();
-
-  /** @summary media query */
-  const matches = useMediaQuery("(min-width:768px)");
 
   return (
     <div
@@ -83,8 +83,9 @@ const InputField = (props: Props) => {
       <FormHelperText id={props.titleId}>{props.titleText}</FormHelperText>
       <Input
         id={props.id}
-        value={myText}
+        className={`${classes.width}`}
         type={props.inputType}
+        value={props.value}
         onChange={handleChange}
         startAdornment={
           <FontAwesomeIcon
@@ -100,6 +101,7 @@ const InputField = (props: Props) => {
           maxLength: props.maxLength,
           "aria-label": props.areaLabel,
         }}
+        classes={{ input: props.addClass.overrideInput }}
       />
     </div>
   );

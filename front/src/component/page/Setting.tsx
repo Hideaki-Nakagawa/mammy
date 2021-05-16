@@ -1,4 +1,4 @@
-import React, { createContext } from "react";
+import React, { createContext, useState } from "react";
 import {
   Theme,
   makeStyles,
@@ -20,11 +20,18 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 );
 
+/** PageID */
+export const SettingPageID = 4;
+
 /** Setting Context */
 export const SettingContext = createContext({
-  userName: "",
+  displayName: "",
+  photoURL: "",
 } as {
-  userName: string;
+  displayName: string;
+  photoURL: string;
+  setName: React.Dispatch<React.SetStateAction<string>>;
+  setURL: React.Dispatch<React.SetStateAction<string>>;
 });
 
 /** Setting コンポーネント */
@@ -32,21 +39,34 @@ const Setting: React.FC = () => {
   /** @summary style hook api */
   const classes: ClassNameMap = useStyles();
 
+  /** @summary state hook */
+  const [displayName, setName] = useState("");
+  const [photoURL, setURL] = useState("");
+
   return (
-    <LayoutAfterLogin>
-      <Grid
-        container
-        direction="column"
-        justify="center"
-        alignItems="center"
-        className="height:100%"
-      >
-        <Avatar className={classes.avatar}>
-          <SettingsIcon />
-        </Avatar>
-        <UserSettingForm />
-      </Grid>
-    </LayoutAfterLogin>
+    <SettingContext.Provider
+      value={{
+        displayName,
+        photoURL,
+        setName,
+        setURL,
+      }}
+    >
+      <LayoutAfterLogin>
+        <Grid
+          container
+          direction="column"
+          justify="center"
+          alignItems="center"
+          className="height:100%"
+        >
+          <Avatar className={classes.avatar}>
+            <SettingsIcon />
+          </Avatar>
+          <UserSettingForm />
+        </Grid>
+      </LayoutAfterLogin>
+    </SettingContext.Provider>
   );
 };
 export default Setting;

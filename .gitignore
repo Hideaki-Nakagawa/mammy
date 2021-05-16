@@ -64,3 +64,7 @@ node_modules/
 
 # dotenv environment variables file
 .env
+
+# public
+public/js/bundle.js
+public/js/bundle.js.map

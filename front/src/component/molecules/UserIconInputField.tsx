@@ -23,8 +23,8 @@ type Props = {
   pageID: number;
 };
 
-/** ユーザ名入力フィールド コンポーネント */
-const UserNameInputField = (props: Props) => {
+/** ユーザアイコンフィールド コンポーネント */
+const UserIconInputField = (props: Props) => {
   /** @summary style hook api */
   const classes: ClassNameMap = useStyles();
 
@@ -63,15 +63,15 @@ const UserNameInputField = (props: Props) => {
   return (
     <InputField
       addClass={classes}
-      titleId="user_name_title"
-      titleText="UserName"
-      id="user_name_input"
+      titleId="user_icon_title"
+      titleText="UserIcon"
+      id="user_icon_input"
       unitText=""
       inputType="text"
       maxLength={50}
-      areaLabel="username"
+      areaLabel="usericon"
       fontType="fas"
-      fontIconName="user"
+      fontIconName="image"
       onChange={(newValue: string) => {
         handleChange(newValue);
       }}
@@ -79,4 +79,4 @@ const UserNameInputField = (props: Props) => {
     />
   );
 };
-export default UserNameInputField;
+export default UserIconInputField;

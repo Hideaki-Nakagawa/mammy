@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext } from "react";
 import {
   makeStyles,
   createStyles,
@@ -21,9 +21,6 @@ const useStyles = makeStyles((theme) =>
 
 /** @summary 性別選択のラジオボタン コンポーネント */
 const GenderRadioBtnGroup: React.FC = () => {
-  /** @summary state hook */
-  const [myGender, setGender] = useState("");
-
   /** @summary context hook api */
   const diagnose = useContext(DiagnoseContext);
 
@@ -32,7 +29,7 @@ const GenderRadioBtnGroup: React.FC = () => {
 
   const handleChange: any = (event: React.ChangeEvent<HTMLInputElement>) => {
     const newValue = event.target.value;
-    setGender(newValue);
+    diagnose.setGender(newValue);
     diagnose.gender = newValue;
   };
 
@@ -42,7 +39,7 @@ const GenderRadioBtnGroup: React.FC = () => {
       <RadioGroup
         aria-label="gender"
         name="gender"
-        value={myGender}
+        value={diagnose.gender}
         onChange={handleChange}
       >
         <FormControlLabel value="male" control={<Radio />} label="おとこの子" />

@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext } from "react";
 import {
   createStyles,
   FormControl,
@@ -21,9 +21,6 @@ const useStyles = makeStyles((theme) =>
 
 /** @summary 月齢選択 コンポーネント */
 const MonthSelect: React.FC = () => {
-  /** @summary state hook */
-  const [myMounth, setMounth] = useState("");
-
   /** @summary context hook api */
   const diagnose = useContext(DiagnoseContext);
 
@@ -33,8 +30,8 @@ const MonthSelect: React.FC = () => {
    */
   const handleChange: any = (event: React.ChangeEvent<HTMLInputElement>) => {
     const newValue = event.target.value;
+    diagnose.setMonth(newValue);
     diagnose.month = newValue;
-    setMounth(newValue);
   };
 
   /** @summary style hook api */
@@ -59,7 +56,7 @@ const MonthSelect: React.FC = () => {
       <Select
         labelId="age_select_label"
         id="age_select"
-        value={myMounth}
+        value={diagnose.month}
         onChange={handleChange}
         variant="standard"
       >

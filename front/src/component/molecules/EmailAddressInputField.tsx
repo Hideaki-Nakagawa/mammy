@@ -34,7 +34,11 @@ const EmailAddressInputField: React.FC = () => {
       areaLabel="email"
       fontType="fas"
       fontIconName="envelope"
-      onChange={(newValue: string) => (login.emailAddress = newValue)}
+      onChange={(newValue: string) => {
+        login.setAddress(newValue);
+        login.emailAddress = newValue;
+      }}
+      value={login.emailAddress}
     />
   );
 };

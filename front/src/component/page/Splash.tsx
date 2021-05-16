@@ -7,6 +7,9 @@ import { Redirect } from "react-router";
 /** Splash Style */
 const useStyles = makeStyles((theme: Theme) => createStyles({}));
 
+/** PageID */
+export const SplashPageID = 0;
+
 /** Splash コンポーネント */
 const Splash: React.FC = () => {
   /** @summary style hook api */

@@ -7,10 +7,13 @@ import { DiagnoseContext } from "../page/Diagnose";
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     sizeBig: {
-      width: "20em",
+      width: "15rem",
     },
     sizeSmall: {
-      width: "5em",
+      width: "7.5rem",
+    },
+    overrideInput: {
+      textAlign: "center",
     },
   })
 );
@@ -34,7 +37,11 @@ const HeightInputField: React.FC = () => {
       areaLabel="height"
       fontType="fas"
       fontIconName="ruler"
-      onChange={(newValue: string) => (diagnose.height = newValue)}
+      onChange={(newValue: string) => {
+        diagnose.setHeight(newValue);
+        diagnose.height = newValue;
+      }}
+      value={diagnose.height}
     />
   );
 };

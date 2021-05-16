@@ -8,8 +8,13 @@ import {
   Button,
 } from "@material-ui/core";
 import { ClassNameMap } from "@material-ui/styles";
-import { EmailAddressInputField, PasswordInputField } from "../molecules";
-import { LoginContext } from "../page/Login";
+import {
+  EmailAddressInputField,
+  PasswordInputField,
+  UserIconInputField,
+  UserNameInputField,
+} from "../molecules";
+import { LoginContext, LoginPageID } from "../page/Login";
 import { AuthContext } from "../../firebase/Auth";
 import { useHistory } from "react-router";
 
@@ -24,14 +29,17 @@ const useStyles = makeStyles((theme: Theme) =>
     iconMargin: {
       marginRight: theme.spacing(1),
     },
-    btnSize: {
-      width: "12rem",
+    sizeBig: {
+      width: "15em",
+    },
+    sizeSmall: {
+      width: "7em",
     },
   })
 );
 
-/** ログインフォーム コンポーネント */
-const LoginForm: React.FC = () => {
+/** アカウント作成フォーム コンポーネント */
+const CreateAccountForm: React.FC = () => {
   /** @summary style hook api */
   const classes: ClassNameMap = useStyles();
 
@@ -47,28 +55,43 @@ const LoginForm: React.FC = () => {
 
   /** @summary Login click */
   const handleLoginClick = useCallback(() => {
-    auth.signin(login.emailAddress, login.password).then((result) => {
-      switch (result) {
-        case "success":
-          history.push("home");
-          break;
-        case "failure":
-        default:
-          break;
-      }
-    });
+    login.isCreateAccount = false;
+    login.setAccount(false);
   }, []);
 
   /** @summary Signup click */
-  const handleSingupClick = useCallback(() => {
-    login.isCreateAccount = true;
-    login.setAccount(true);
+  const handleSingupClick = useCallback(async () => {
+    await auth.signup(login.emailAddress, login.password).then((result) => {
+      switch (result) {
+        case "success":
+          break;
+        case "failure":
+        default:
+          console.log("failure signup");
+          return;
+      }
+    });
+    await auth
+      .updateProfile(login.displayName, login.photoURL)
+      .then((result) => {
+        switch (result) {
+          case "success":
+            break;
+          case "failure":
+          default:
+            console.log("failure updateProfile");
+            return;
+        }
+      });
+    console.log("success createAccount");
   }, []);
 
   return (
     <Grid container direction="column" justify="center" alignItems="center">
       <EmailAddressInputField />
       <PasswordInputField />
+      <UserNameInputField pageID={LoginPageID} />
+      <UserIconInputField pageID={LoginPageID} />
       <Grid
         container
         direction={matches ? "row" : "column"}
@@ -89,10 +112,10 @@ const LoginForm: React.FC = () => {
           onClick={handleSingupClick}
           className={`${classes.margin} ${classes.withoutLabel} ${classes.btnSize}`}
         >
-          新規作成
+          アカウント作成
         </Button>
       </Grid>
     </Grid>
   );
 };
-export default LoginForm;
+export default CreateAccountForm;

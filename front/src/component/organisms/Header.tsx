@@ -1,5 +1,5 @@
 import React, { useContext, useState } from "react";
-import { useHistory, useLocation } from "react-router";
+import { Redirect, useHistory, useLocation } from "react-router";
 import clsx from "clsx";
 import {
   makeStyles,
@@ -74,6 +74,10 @@ const useStyles = makeStyles((theme: Theme) =>
       // necessary for content to be below app bar
       ...theme.mixins.toolbar,
       justifyContent: "flex-end",
+    },
+    userIcon: {
+      width: "1rem",
+      height: "1rem",
     },
   })
 );
@@ -198,23 +202,40 @@ const Header: React.FC = () => {
   };
 
   /**
+   * @summary AuthContextからログイン中のユーザ画像を取得する関数
+   * @details displayNameを表示、設定がなければemailから表示
+   */
+  const getLoginUserIcon = () => {
+    const userIcon: JSX.Element[] = [];
+    if (auth.currentUser) {
+      if (auth.currentUser.photoURL) {
+        userIcon.push(
+          <img src={auth.currentUser.photoURL} className={classes.userIcon} />
+        );
+      } else {
+        userIcon.push(<AccountBox />);
+      }
+    }
+    return userIcon;
+  };
+
+  /**
    * @summary AuthContextからログイン中のユーザ名を取得する関数
    * @details displayNameを表示、設定がなければemailから表示
    */
   const getLoginUserName = (): string => {
     let userName = "null";
     if (auth.currentUser) {
-      if (auth.currentUser.displayName) {
-        userName = auth.currentUser.displayName;
-      } else {
-        userName = auth.currentUser.email ? auth.currentUser.email : "none";
-      }
+      userName = auth.currentUser.displayName
+        ? auth.currentUser.displayName
+        : "none";
     }
     return userName;
   };
 
   return (
     <div className={classes.root}>
+      {auth.currentUser ? "" : <Redirect to={"login"} />}
       <CssBaseline />
       <AppBar
         position="fixed"
@@ -245,7 +266,7 @@ const Header: React.FC = () => {
         }}
       >
         <div className={classes.drawerHeader}>
-          <AccountBox />
+          {getLoginUserIcon()}
           {getLoginUserName()}
           <IconButton onClick={handleDrawerClose}>
             {theme.direction === "ltr" ? (
