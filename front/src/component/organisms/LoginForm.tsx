@@ -6,6 +6,7 @@ import {
   Grid,
   useMediaQuery,
   Button,
+  Link,
 } from "@material-ui/core";
 import { ClassNameMap } from "@material-ui/styles";
 import { EmailAddressInputField, PasswordInputField } from "../molecules";
@@ -48,50 +49,47 @@ const LoginForm: React.FC = () => {
   /** @summary Login click */
   const handleLoginClick = useCallback(() => {
     auth.signin(login.emailAddress, login.password).then((result) => {
-      switch (result) {
-        case "success":
-          history.push("home");
-          break;
-        case "failure":
-        default:
-          break;
+      if (result === "success") {
+        history.push("home");
       }
     });
   }, []);
 
   /** @summary Signup click */
   const handleSingupClick = useCallback(() => {
-    login.isCreateAccount = true;
-    login.setAccount(true);
+    const mode = "create";
+    login.mode = mode;
+    login.setMode(mode);
+  }, []);
+
+  /** @summay Reset click */
+  const handleResetClick = useCallback(() => {
+    const mode = "reset";
+    login.mode = mode;
+    login.setMode(mode);
   }, []);
 
   return (
     <Grid container direction="column" justify="center" alignItems="center">
       <EmailAddressInputField />
       <PasswordInputField />
-      <Grid
-        container
-        direction={matches ? "row" : "column"}
-        justify="center"
-        alignItems="center"
+      <Button
+        variant="contained"
+        color="primary"
+        onClick={handleLoginClick}
+        className={`${classes.margin} ${classes.withoutLabel} ${classes.btnSize}`}
       >
-        <Button
-          variant="contained"
-          color="primary"
-          onClick={handleLoginClick}
-          className={`${classes.margin} ${classes.withoutLabel} ${classes.btnSize}`}
-        >
-          ログイン
-        </Button>
-        <Button
-          variant="contained"
-          color="primary"
-          onClick={handleSingupClick}
-          className={`${classes.margin} ${classes.withoutLabel} ${classes.btnSize}`}
-        >
-          新規作成
-        </Button>
-      </Grid>
+        ログイン
+      </Button>
+      <Link onClick={handleResetClick}>ログインできない方はこちら</Link>
+      <Button
+        variant="contained"
+        color="primary"
+        onClick={handleSingupClick}
+        className={`${classes.margin} ${classes.withoutLabel} ${classes.btnSize}`}
+      >
+        新規作成
+      </Button>
     </Grid>
   );
 };

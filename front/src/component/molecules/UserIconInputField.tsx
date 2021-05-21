@@ -36,12 +36,12 @@ const UserIconInputField = (props: Props) => {
   const handleChange = (value: string) => {
     switch (props.pageID) {
       case SettingPageID:
-        setting.setName(value);
-        setting.displayName = value;
+        setting.setURL(value);
+        setting.photoURL = value;
         break;
       case LoginPageID:
-        login.setName(value);
-        login.displayName = value;
+        login.setURL(value);
+        login.photoURL = value;
         break;
       default:
         break;
@@ -52,9 +52,9 @@ const UserIconInputField = (props: Props) => {
   const selectValue = (): string => {
     switch (props.pageID) {
       case SettingPageID:
-        return setting.displayName;
+        return setting.photoURL;
       case LoginPageID:
-        return login.displayName;
+        return login.photoURL;
       default:
         return "";
     }

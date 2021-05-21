@@ -8,7 +8,7 @@ import {
   Typography,
 } from "@material-ui/core";
 import { ClassNameMap } from "@material-ui/styles";
-import { CreateAccountForm, LoginForm } from "../organisms";
+import { CreateAccountForm, LoginForm, ResetPasswordForm } from "../organisms";
 import LockOutlinedIcon from "@material-ui/icons/LockOutlined";
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -25,18 +25,18 @@ export const LoginPageID = 1;
 
 /** Login Context */
 export const LoginContext = createContext({
-  isCreateAccount: false,
+  mode: "",
   emailAddress: "",
   password: "",
   displayName: "",
   photoURL: "",
 } as {
-  isCreateAccount: boolean;
+  mode: string;
   emailAddress: string;
   password: string;
   displayName: string;
   photoURL: string;
-  setAccount: React.Dispatch<React.SetStateAction<boolean>>;
+  setMode: React.Dispatch<React.SetStateAction<string>>;
   setAddress: React.Dispatch<React.SetStateAction<string>>;
   setPassword: React.Dispatch<React.SetStateAction<string>>;
   setName: React.Dispatch<React.SetStateAction<string>>;
@@ -49,21 +49,37 @@ const Login: React.FC = () => {
   const classes: ClassNameMap = useStyles();
 
   /** @summary state hook */
-  const [isCreateAccount, setAccount] = useState(false);
+  const [mode, setMode] = useState("");
   const [emailAddress, setAddress] = useState("");
   const [password, setPassword] = useState("");
   const [displayName, setName] = useState("");
   const [photoURL, setURL] = useState("");
 
+  /**
+   * @summary 現在の表示モードに応じたコンポーネントを返す
+   * @returns 表示内容のコンポーネント
+   */
+  const selectMode = () => {
+    switch (mode) {
+      default:
+      case "login":
+        return <LoginForm />;
+      case "create":
+        return <CreateAccountForm />;
+      case "reset":
+        return <ResetPasswordForm />;
+    }
+  };
+
   return (
     <LoginContext.Provider
       value={{
-        isCreateAccount,
+        mode,
         emailAddress,
         password,
         displayName,
         photoURL,
-        setAccount,
+        setMode,
         setAddress,
         setPassword,
         setName,
@@ -83,7 +99,7 @@ const Login: React.FC = () => {
         <Typography component="h1" variant="h5">
           Account
         </Typography>
-        {isCreateAccount ? <CreateAccountForm /> : <LoginForm />}
+        {selectMode()}
       </Grid>
     </LoginContext.Provider>
   );

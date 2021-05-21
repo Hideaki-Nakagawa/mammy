@@ -1,16 +1,12 @@
 import React, { useCallback, useContext } from "react";
-import {
-  Theme,
-  makeStyles,
-  createStyles,
-  Grid,
-  useMediaQuery,
-  Button,
-} from "@material-ui/core";
+import { Theme, makeStyles, createStyles, Grid } from "@material-ui/core";
 import { ClassNameMap } from "@material-ui/styles";
 import { SettingContext, SettingPageID } from "../page/Setting";
 import { UserIconInputField, UserNameInputField } from "../molecules";
 import { AuthContext } from "../../firebase/Auth";
+import { useHistory } from "react-router";
+import { ConfirmDialog, Notify } from "../atoms";
+import { AlertProps } from "@material-ui/lab/Alert";
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -20,11 +16,8 @@ const useStyles = makeStyles((theme: Theme) =>
     withoutLabel: {
       marginTop: theme.spacing(3),
     },
-    iconMargin: {
-      marginRight: theme.spacing(1),
-    },
     btnSize: {
-      width: "7rem",
+      width: "12rem",
     },
   })
 );
@@ -38,48 +31,78 @@ const UserSettingForm: React.FC = () => {
   const setting = useContext(SettingContext);
   const auth = useContext(AuthContext);
 
-  /** @summary media query */
-  const matches = useMediaQuery("(min-width:768px)");
+  /** @summary history hook api */
+  const history = useHistory();
 
   /** @summary apply button click */
-  const handleApplyClick = useCallback(() => {
+  const handleApplyClick = useCallback(async () => {
     setting.photoURL = "https://picsum.photos/200/300"; //仮
-    auth.updateProfile(setting.displayName, setting.photoURL);
+    try {
+      await auth
+        .updateProfile(setting.displayName, setting.photoURL)
+        .then((result: string) => {
+          if (result === "error") {
+            throw "error - updataProfie";
+          }
+        });
+      return "success";
+    } catch (error) {
+      console.log(error);
+      return "error";
+    }
   }, []);
 
   /** @summary clear button click */
-  const handleClearClick = useCallback(() => {
+  const handleClearClick = useCallback(async () => {
     setting.setName("");
     setting.setURL("");
-    auth.updateProfile(setting.displayName, setting.photoURL);
+    try {
+      await auth
+        .updateProfile(setting.displayName, setting.photoURL)
+        .then((result: string) => {
+          if (result === "error") {
+            throw "error - clearProfie";
+          }
+        });
+      return "success";
+    } catch (error) {
+      console.log(error);
+      return "error";
+    }
   }, []);
+
+  /** @summay user delete button click */
+  const handleDeleteClick = useCallback(() => {
+    auth.deleteUser();
+    history.push("/login");
+  }, []);
+
+  const alertProps: AlertProps = {
+    severity: "success",
+  };
 
   return (
     <Grid container direction="column" justify="center" alignItems="center">
       <UserNameInputField pageID={SettingPageID} />
       <UserIconInputField pageID={SettingPageID} />
-      <Grid container direction="row" justify="center" alignItems="center">
-        <Button
-          variant="contained"
-          color="primary"
-          onClick={handleApplyClick}
-          className={`${classes.margin} ${classes.withoutLabel} ${
-            matches ? classes.sizeBig : classes.sizeSmall
-          }`}
-        >
-          適用
-        </Button>
-        <Button
-          variant="contained"
-          color="primary"
-          onClick={handleClearClick}
-          className={`${classes.margin} ${classes.withoutLabel} ${
-            matches ? classes.sizeBig : classes.sizeSmall
-          }`}
-        >
-          クリア
-        </Button>
-      </Grid>
+      <Notify
+        btnName="適用"
+        dlgContent="アカウント情報の更新に成功しました。"
+        onClick={handleApplyClick}
+        alertProps={alertProps}
+      />
+      <Notify
+        btnName="クリア"
+        dlgContent="アカウント情報のクリアに成功しました。"
+        onClick={handleClearClick}
+        alertProps={alertProps}
+      />
+      <ConfirmDialog
+        btnName="アカウント削除"
+        dlgTitle="注意"
+        dlgContent="本当にアカウントを削除しますか？"
+        onClickOK={handleDeleteClick}
+      />
     </Grid>
   );
 };

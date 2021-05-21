@@ -1,12 +1,5 @@
 import React, { useCallback, useContext } from "react";
-import {
-  Theme,
-  makeStyles,
-  createStyles,
-  Grid,
-  useMediaQuery,
-  Button,
-} from "@material-ui/core";
+import { Theme, makeStyles, createStyles, Grid, Link } from "@material-ui/core";
 import { ClassNameMap } from "@material-ui/styles";
 import {
   EmailAddressInputField,
@@ -16,7 +9,9 @@ import {
 } from "../molecules";
 import { LoginContext, LoginPageID } from "../page/Login";
 import { AuthContext } from "../../firebase/Auth";
-import { useHistory } from "react-router";
+import { ArrowBack } from "@material-ui/icons";
+import { Notify } from "../atoms";
+import { AlertProps } from "@material-ui/lab/Alert";
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -29,11 +24,8 @@ const useStyles = makeStyles((theme: Theme) =>
     iconMargin: {
       marginRight: theme.spacing(1),
     },
-    sizeBig: {
-      width: "15em",
-    },
-    sizeSmall: {
-      width: "7em",
+    btnSize: {
+      width: "12rem",
     },
   })
 );
@@ -43,48 +35,50 @@ const CreateAccountForm: React.FC = () => {
   /** @summary style hook api */
   const classes: ClassNameMap = useStyles();
 
-  /** @summary history hook api */
-  const history = useHistory();
-
-  /** @summary media query */
-  const matches = useMediaQuery("(min-width:768px)");
-
   /** @summary context hook api */
   const login = useContext(LoginContext);
   const auth = useContext(AuthContext);
 
-  /** @summary Login click */
-  const handleLoginClick = useCallback(() => {
-    login.isCreateAccount = false;
-    login.setAccount(false);
+  /**
+   * @summary Signup click
+   * @details アカウントを作成とプロファイルの設定を行う
+   */
+  const handleSingupClick = useCallback(async () => {
+    try {
+      await auth
+        .signup(login.emailAddress, login.password)
+        .then((result: string) => {
+          if (result === "error") {
+            throw "error - signup";
+          }
+        });
+      await auth
+        .updateProfile(login.displayName, login.photoURL)
+        .then((result: string) => {
+          if (result === "error") {
+            throw "error - updateProfile";
+          }
+        });
+      return "success";
+    } catch (error) {
+      console.log(error);
+      return "error";
+    }
   }, []);
 
-  /** @summary Signup click */
-  const handleSingupClick = useCallback(async () => {
-    await auth.signup(login.emailAddress, login.password).then((result) => {
-      switch (result) {
-        case "success":
-          break;
-        case "failure":
-        default:
-          console.log("failure signup");
-          return;
-      }
-    });
-    await auth
-      .updateProfile(login.displayName, login.photoURL)
-      .then((result) => {
-        switch (result) {
-          case "success":
-            break;
-          case "failure":
-          default:
-            console.log("failure updateProfile");
-            return;
-        }
-      });
-    console.log("success createAccount");
+  /**
+   * @summary Back click
+   * @details 戻るボタンを押したとき
+   */
+  const handleBack = useCallback(() => {
+    const mode = "login";
+    login.mode = mode;
+    login.setMode(mode);
   }, []);
+
+  const alertProps: AlertProps = {
+    severity: "success",
+  };
 
   return (
     <Grid container direction="column" justify="center" alignItems="center">
@@ -92,29 +86,16 @@ const CreateAccountForm: React.FC = () => {
       <PasswordInputField />
       <UserNameInputField pageID={LoginPageID} />
       <UserIconInputField pageID={LoginPageID} />
-      <Grid
-        container
-        direction={matches ? "row" : "column"}
-        justify="center"
-        alignItems="center"
-      >
-        <Button
-          variant="contained"
-          color="primary"
-          onClick={handleLoginClick}
-          className={`${classes.margin} ${classes.withoutLabel} ${classes.btnSize}`}
-        >
-          ログイン
-        </Button>
-        <Button
-          variant="contained"
-          color="primary"
-          onClick={handleSingupClick}
-          className={`${classes.margin} ${classes.withoutLabel} ${classes.btnSize}`}
-        >
-          アカウント作成
-        </Button>
-      </Grid>
+      <Notify
+        btnName="アカウント作成"
+        dlgContent="アカウントの作成に成功しました。"
+        onClick={handleSingupClick}
+        alertProps={alertProps}
+      />
+      <Link onClick={handleBack}>
+        <ArrowBack />
+        戻る
+      </Link>
     </Grid>
   );
 };

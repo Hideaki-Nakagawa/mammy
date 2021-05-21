@@ -14,6 +14,7 @@ const AuthContext = createContext({
   signout: () => Promise<void>;
   updateProfile: (displayName: string, photoURL: string) => Promise<string>;
   resetPassword: (email: string) => Promise<string>;
+  deleteUser: () => Promise<string>;
 });
 
 /** Authコンポーネント */
@@ -26,7 +27,7 @@ const AuthProvider: React.FC = ({ children }) => {
    * @param[in] email : メールアドレス
    * @param[in] password : パスワード
    * @retval success : 成功
-   * @retval failure : 失敗
+   * @retval error : エラー
    */
   const signup = useCallback(
     async (email: string, password: string): Promise<string> => {
@@ -35,7 +36,7 @@ const AuthProvider: React.FC = ({ children }) => {
         return "success";
       } catch (error) {
         alert(error);
-        return "failure";
+        return "error";
       }
     },
     []
@@ -46,7 +47,7 @@ const AuthProvider: React.FC = ({ children }) => {
    * @param[in] email : メールアドレス
    * @param[in] password : パスワード
    * @retval success : 成功
-   * @retval failure : 失敗
+   * @retval error : エラー
    */
   const signin = useCallback(
     async (email: string, password: string): Promise<string> => {
@@ -55,7 +56,7 @@ const AuthProvider: React.FC = ({ children }) => {
         return "success";
       } catch (error) {
         alert(error);
-        return "failure";
+        return "error";
       }
     },
     []
@@ -89,7 +90,7 @@ const AuthProvider: React.FC = ({ children }) => {
    * @param[in] displayName : ユーザー名
    * @param[in] photoURL : ユーザー画像
    * @retval success : 成功
-   * @retval failure : 失敗
+   * @retval error : エラー
    */
   const updateProfile = useCallback(
     async (displayName: string, photoURL: string): Promise<string> => {
@@ -98,7 +99,7 @@ const AuthProvider: React.FC = ({ children }) => {
         return "success";
       } catch (error) {
         alert(error);
-        return "failure";
+        return "error";
       }
     },
     []
@@ -108,7 +109,7 @@ const AuthProvider: React.FC = ({ children }) => {
    * @summary パスワードを再設定するためのメールを送る
    * @param[in] email : メールアドレス
    * @retval success : 成功
-   * @retval failure : 失敗
+   * @retval error : エラー
    */
   const resetPassword = useCallback(async (email: string): Promise<string> => {
     try {
@@ -116,7 +117,23 @@ const AuthProvider: React.FC = ({ children }) => {
       return "success";
     } catch (error) {
       alert(error);
-      return "failure";
+      return "error";
+    }
+  }, []);
+
+  /**
+   * @summary ユーザーを削除する
+   * @retval success : 成功
+   * @retval error : エラー
+   * @details ログイン中のユーザを削除する
+   */
+  const deleteUser = useCallback(async (): Promise<string> => {
+    try {
+      await app.auth().currentUser?.delete();
+      return "success";
+    } catch (error) {
+      alert(error);
+      return "error";
     }
   }, []);
 
@@ -141,6 +158,7 @@ const AuthProvider: React.FC = ({ children }) => {
         signout,
         updateProfile,
         resetPassword,
+        deleteUser,
       }}
     >
       {children}
