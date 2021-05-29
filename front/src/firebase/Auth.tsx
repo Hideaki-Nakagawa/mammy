@@ -2,20 +2,21 @@ import React, { createContext, useCallback, useEffect, useState } from "react";
 import { app } from "./firebase";
 import firebase from "firebase/app";
 import "firebase/auth";
+import "firebase/firestore";
 
 /** Auth Context */
-const AuthContext = createContext({
-  // currentUser: null,
-} as {
-  currentUser: firebase.User | null;
-  signup: (email: string, password: string) => Promise<string>;
-  signin: (email: string, password: string) => Promise<string>;
-  signinWithGoogle: () => Promise<void>;
-  signout: () => Promise<void>;
-  updateProfile: (displayName: string, photoURL: string) => Promise<string>;
-  resetPassword: (email: string) => Promise<string>;
-  deleteUser: () => Promise<string>;
-});
+const AuthContext = createContext(
+  {} as {
+    currentUser: firebase.User | null;
+    signup: (email: string, password: string) => Promise<string>;
+    signin: (email: string, password: string) => Promise<string>;
+    signinWithGoogle: () => Promise<void>;
+    signout: () => Promise<void>;
+    updateProfile: (displayName: string, photoURL: string) => Promise<string>;
+    resetPassword: (email: string) => Promise<string>;
+    deleteUser: () => Promise<string>;
+  }
+);
 
 /** Authコンポーネント */
 const AuthProvider: React.FC = ({ children }) => {
@@ -53,6 +54,7 @@ const AuthProvider: React.FC = ({ children }) => {
     async (email: string, password: string): Promise<string> => {
       try {
         await app.auth().signInWithEmailAndPassword(email, password);
+        await updateUserDB(app.auth().currentUser);
         return "success";
       } catch (error) {
         alert(error);
@@ -95,7 +97,9 @@ const AuthProvider: React.FC = ({ children }) => {
   const updateProfile = useCallback(
     async (displayName: string, photoURL: string): Promise<string> => {
       try {
-        await app.auth().currentUser?.updateProfile({ displayName, photoURL });
+        const user = app.auth().currentUser;
+        await user?.updateProfile({ displayName, photoURL });
+        await updateUserDB(user);
         return "success";
       } catch (error) {
         alert(error);
@@ -129,13 +133,74 @@ const AuthProvider: React.FC = ({ children }) => {
    */
   const deleteUser = useCallback(async (): Promise<string> => {
     try {
-      await app.auth().currentUser?.delete();
+      const user = app.auth().currentUser;
+      await deleteUserDB(user);
+      await user?.delete();
       return "success";
     } catch (error) {
       alert(error);
       return "error";
     }
   }, []);
+
+  /**
+   * @summary FireStoreにユーザー情報を保存
+   */
+  const updateUserDB = async (user: firebase.User | null) => {
+    try {
+      //ログインなし
+      if (!user) {
+        throw "updateUserDB - login user is null";
+      }
+      const userDoc = await app
+        .firestore()
+        .collection("users")
+        .doc(user.uid)
+        .get();
+      if (!userDoc.exists) {
+        //新規作成
+        await userDoc.ref.set({
+          userId: user.uid,
+          email: user.email,
+          name: user.displayName,
+          icon: user.photoURL,
+          time: firebase.firestore.FieldValue.serverTimestamp(),
+        });
+      } else {
+        //更新
+        await userDoc.ref.update({
+          email: user.email,
+          name: user.displayName,
+          icon: user.photoURL,
+          time: firebase.firestore.FieldValue.serverTimestamp(),
+        });
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  /**
+   * @summary FireStoreにユーザー情報を削除
+   */
+  const deleteUserDB = async (user: firebase.User | null) => {
+    try {
+      //ログインなし
+      if (!user) {
+        throw "deleteUserDB - login user is null";
+      }
+      await app
+        .firestore()
+        .collection("users")
+        .doc(user.uid)
+        .delete()
+        .then(() => {
+          console.log("deleteUserDB - Document successfully deleted!");
+        });
+    } catch (error) {
+      console.error("deleteUserDB - ", error);
+    }
+  };
 
   /**
    * @summary effect hook

@@ -22,3 +22,24 @@ export const helloWorld = async () => {
     alert(error);
   }
 };
+
+/**
+ * @summary firebaseにjson形式のデータを追加する関数
+ * @param colName : firebaseに登録するときのコレクション名
+ * @param mode : 動作モード
+ * @arg "update" : 更新モード
+ * @arg "new" ; 追加モード(default)
+ * @param json : 登録するjson形式のデータ
+ */
+export const addDataset = async (colName: string, mode: string, json: any) => {
+  try {
+    const addDataset = firebase.functions().httpsCallable("addDataset");
+    await addDataset({ collection: colName, mode: mode, dataset: json }).then(
+      (result) => {
+        console.log(result);
+      }
+    );
+  } catch (error) {
+    alert(error);
+  }
+};

@@ -16,6 +16,8 @@ import {
 } from "../molecules";
 import { AlertDialog } from "../atoms";
 import { DiagnoseContext } from "../page/Diagnose";
+import { addDataset } from "../../firebase/firebase";
+import growUpData from "../../resource/dataset/GrowUpData.json";
 
 const useStyles = makeStyles((theme: Theme) => createStyles({}));
 
@@ -25,6 +27,14 @@ const DiagnoseForm: React.FC = () => {
   const classes: ClassNameMap = useStyles();
   /** @summary context hook api */
   const diagnose = useContext(DiagnoseContext);
+  /** @summary firestoreにgrowUpdataを登録する */
+  const addGrowUpData = () => {
+    addDataset("growUpData", "new", growUpData);
+  };
+  /** @summary firestoreにgrowUpdataを更新する */
+  const updateGrowUpData = () => {
+    addDataset("growUpData", "update", growUpData);
+  };
   return (
     <Grid container direction="column" justify="center" alignItems="center">
       <GenderRadioBtnGroup />
